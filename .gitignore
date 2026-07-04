@@ -1,6 +1,7 @@
 # Build output
 dist/
 *.zip
+docs/
 
 # OS / editor cruft
 Thumbs.db

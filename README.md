@@ -1,45 +1,49 @@
-# Gunk — a slime companion for Ancient Dungeon VR
+# Gunk — the sewer slime that follows you home
 
-> Rescue **Gunk**, a filthy little Noxious Sewers slimeling. He'll bounce along at your side and bowl into anything
-> that gets close — until the dungeon takes him back.
+> Everything in the Noxious Sewers wants you dead. **Gunk** just wants to come along.
 
-A fan-made mod for [Ancient Dungeon VR](https://store.steampowered.com/app/1125400/Ancient_Dungeon_VR/) (by ErThu),
-built on the game's official Lua modding API. Not affiliated with or endorsed by ErThu.
+A fan-made companion mod for [Ancient Dungeon VR](https://store.steampowered.com/app/1125400/Ancient_Dungeon_VR/)
+(by ErThu), built on the game's official Lua modding API. Not affiliated with or endorsed by ErThu.
 
 ---
 
-## What is Gunk?
+## Who is Gunk?
 
-Gunk is the runt of the Noxious Sewers — too small to be a threat, too filthy to be worth squashing. Find him on a
-New Game Plus run and he imprints on the first delver who doesn't squish him. Take his relic and he fights at your
-side: hopping in, body-slamming hostiles, and dealing a flat share of your own weapon's damage.
+Gunk is the runt of the Noxious Sewers — too small to threaten anyone, too filthy to be worth the boot. Find him
+on a New Game Plus run and he imprints on the first delver who doesn't squish him. Take his relic and he's yours
+for the run: bouncing at your heel, hurling his whole tiny body at anything hostile, and hitting harder as *you*
+hit harder — his damage is carved off your own.
 
-But the deeper you go, the more his homeland wants him back. At **NG++**, the sewers corrupt him into an
-acid-spitter — permanently, and visibly: still your little slime, but his skin rots into the sewers' own festering
-hide, and he lobs slow, fat globs of acid that keep burning where they land. He's not your harmless little buddy
-anymore. *(Prefer him one way or the other? The "Spitter Form" mod setting can force or disable the corruption.)*
+But the deeper you go, the more his homeland wants him back. At **NG++** the sewers reclaim him — permanently,
+and visibly. His skin darkens into the sewers' own festering rot, and the harmless headbutt becomes a mouthful of
+acid: slow, fat globs lobbed in a lazy arc that burn where they land and keep burning after. Same little slime.
+Much worse manners. *(Prefer him one way or the other? The "Spitter Form" setting can force or forbid the
+corruption.)*
 
 ## Features
 
-- **A real companion**, not a turret — he hops around like a normal slime and redirects onto nearby enemies to
-  body-slam them, then returns to your side.
-- **Scales with you** — his hits draw on your own weapon power (a share of your primary + secondary damage),
-  sampled live, so he keeps pace as you grow.
-- **Unkillable** — nothing puts Gunk down. He's a true companion, not a fragile pet, so the chaos of a deep run
-  never costs you your buddy.
-- **Earned, not handed out** — Gunk only appears at New Game Plus, as a reward for going back down.
-- **A story with a cost** — at NG++ his home corrupts him into the acid-spitting form, for good.
-- **Tunable in-game** — damage, hop height, speed, hunt range and leash distance all have sliders under
-  **Settings → Mods → Gunk**, and changes apply live within seconds (works on Quest and PCVR, no file editing).
-- **Survives everything** — quit mid-run and continue later, and Gunk comes back: his relic re-drops at your feet
-  when the save loads, on whatever floor you left off.
+- **A real companion, not a turret** — he hops around like any slime, pounces on nearby enemies, body-slams
+  them, and bounces back to your side like nothing happened.
+- **Scales with you** — his hits draw on your live primary + secondary damage. Upgrade yourself and you've
+  upgraded him.
+- **Unkillable** — the dungeon has tried. Nothing puts Gunk down, so the chaos of a deep run never costs you
+  your buddy.
+- **Earned, not handed out** — he only appears at New Game Plus, a reward for going back down.
+- **A story with a cost** — at NG++ his home corrupts him into the Spitter, for good. He announces the change
+  himself, both ways.
+- **An honest artillery slime** — Spitter globs are real projectiles on a smooth arc. Damage lands where the
+  glob lands: dodgeable, splashy, and every impact leaves an acid puddle. He even winds up before each lob and
+  settles after, like he means it.
+- **Tune him in the headset** — damage, movement, spit behavior, unlock rules: every knob is a row of one-tap
+  presets under **Settings → Mods → Gunk**, applying live within seconds. Works on Quest and PCVR, no file
+  editing.
+- **Survives everything — including you quitting** — leave mid-run and continue later, and his relic re-drops at
+  your feet when the save loads, whatever floor you're on.
 
 ## Mod settings
 
-Open **Settings → Mods → Gunk** in-game. All values apply live (within ~2 s) — no restart needed:
-
-Every setting is a row of notched presets (no sliders) — the selected option is always visible, and the panel
-re-opens on whatever you chose.
+Open **Settings → Mods → Gunk** in-game. Every setting is a row of notched presets — the selected option is
+always visible, the panel re-opens on whatever you chose, and changes apply live (within ~2 s):
 
 | Setting | Options | Default | What it does |
 | --- | --- | --- | --- |
@@ -57,15 +61,16 @@ re-opens on whatever you chose.
 | Spitter Form | At NG++ / Always / Never | At NG++ | The story rule (corrupted at NG++), force the acid-spitter everywhere, or keep him melee forever — switches live, even mid-run |
 | Teaser Delay | 1 / 2 / 3 / 5 s | 2 s | How long after the relic drops the teaser text appears |
 
-The leash is always kept at least 2 m longer than the hunt range (otherwise he could chase prey straight out of
-his own leash and despawn mid-charge).
+The leash always stays at least 2 m longer than the hunt range — otherwise he could chase prey straight out of
+his own leash and despawn mid-pounce, which is embarrassing for everyone.
 
 ## How to get Gunk
 
-1. Reach **New Game Plus** (NG+). *(Or set "Appears At" to **Any Run** in the mod settings to skip this.)*
-2. Descend into the **Noxious Sewers**. On entry, Gunk's relic appears beside you with a short message.
-3. **Pick up the relic** to recruit him for the rest of the run. Leave it and he simply waits in the muck.
-4. Reach **NG++** and the sewers will corrupt him into the Spitter.
+1. Reach **New Game Plus**. *(Or set "Appears At" to **Any Run** and skip the grind.)*
+2. Descend into the **Noxious Sewers**. Something small tumbles into the muck nearby.
+3. **Pick up the relic** to recruit him for the rest of the run. Leave it, and he waits in the muck. He's used
+   to waiting.
+4. Reach **NG++** and the sewers take him back — corrupted, and spitting.
 
 ## Install
 

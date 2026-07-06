@@ -74,15 +74,14 @@ his own leash and despawn mid-pounce, which is embarrassing for everyone.
 
 ## Install
 
-Download the latest `Gunk.zip` from the Releases page (or Nexus Mods) and **keep it zipped**: the game reads
+Download the latest `Gunk.zip` from the Releases page (or Nexus Mods, rename it if needed) and **keep it zipped**: the game reads
 the zip directly.
 
 ### PCVR (Steam / Rift)
 
-1. Drop `Gunk.zip` into your ADVR mods folder:
-   `%USERPROFILE%\AppData\LocalLow\ErThu\Ancient_Dungeon\ADVR_Mods\`
-   *(paste that straight into the File Explorer address bar: `AppData` is a hidden folder).*
-2. Launch the game in VR and enable the mod in the in-game **mods menu**.
+1. First, enable mods to set up the proper folder structure. Launch the game in VR, and in the settings menu on the right, you’ll see a box that enables mods when clicked. Then you can exit the game.
+2. Drop **Gunk.zip** into `%USERPROFILE%\AppData\LocalLow\ErThu\Ancient_Dungeon\ADVR_Mods\` *(paste that straight into the File Explorer address bar - AppData is a hidden folder)*.
+3. Launch the game in VR and enable the mod in the in-game **mods menu**.
 
 ### Quest (standalone headset)
 
@@ -91,8 +90,7 @@ the zip directly.
    after.
 2. Connect the Quest to a computer with a USB cable and **allow file access** (approve the prompt inside the
    headset). Browse the Quest's storage with Windows Explorer, SideQuest, or Android File Transfer on Mac.
-3. Navigate to `Android/data/de.erthu.ancientdungeonfull/files/` and, if it isn't there already, create a folder
-   named exactly `ADVR_Mods`.
+3. Navigate to `/sdcard/Android/data/de.erthu.ancientdungeonfull/files/ADVR_Mods/`.
 4. Copy `Gunk.zip` into that folder, unplug, launch the game, and enable the mod in the in-game **mods menu**.
 
 **Mod version:** 1.0.0 (see [CHANGELOG.md](CHANGELOG.md)) · **Game version:** built and tested against `ea0.1.10.1`.

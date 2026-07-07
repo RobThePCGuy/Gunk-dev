@@ -121,6 +121,25 @@ PUDDLE_MAX = 4              -- max active impact puddles
 PUDDLE_LIFETIME_TICKS = 30  -- ~3s per puddle
 PUDDLE_RADIUS = 1.0         -- puddle damage radius
 PUDDLE_TICK_TICKS = 5       -- ticks between a puddle's damage applications
+-- ===================== A Walk in the Park compensator =====================
+-- The Acolyte perk (gamedata/progress_shops/acolyte/a_walk_in_the_park.lua) grants up to +20% move speed while
+-- NO enemy is within 13 m -- but its check, game.GetEnemiesInRadius(13, player pos, false), COUNTS invincible
+-- enemies, so Gunk pins the perk at 1.0x forever. There is no API to hide one enemy from that query (verified
+-- against the shipped script and the exposed EnemyBase surface), so instead: player.MoveSpeed multiplies its
+-- KEYED entries together, and when every "enemy" the perk can see is Gunk (identified by his own
+-- RegisterInvincibility id -- nothing vanilla carries it), this applies an equal compensating multiplier under
+-- our own key. perk(1.0, suppressed) x comp(1.2) == what the perk alone gives without Gunk, and the comp ramps
+-- down the moment any REAL hostile enters the radius, at the perk's own ramp rate. Gated on the perk actually
+-- being bought -- players without it get nothing.
+WALK_PERK_ID = "a_walk_in_the_park"  -- vanilla progress id (ids are the gamedata filenames)
+WALK_COMP_KEY = "gunk_walk_comp"     -- OUR MoveSpeed multiplier key -- never write under the perk's own key
+WALK_RADIUS = 13.0                   -- MUST mirror the radius hardcoded in the vanilla perk script
+WALK_MAX = 1.2                       -- MUST mirror the perk's MaxSpeed
+WALK_STEP = 0.007                    -- per-tick ramp -- the perk's 0.07/s AdjustSpeed at our 10 Hz tick
+WALK_SCAN_TICKS = 5                  -- re-decide boost/no-boost every 0.5s (the ramp itself runs every tick)
+WalkComp = 1.0                       -- our current compensating multiplier (1.0 = inactive, no entry registered)
+WalkBoost = false                    -- latest scan verdict -- true = the perk is suppressed by Gunk alone
+WalkPerkBought = false               -- cached IsBought() -- refreshed on the CFG cadence, never mid-scan
 
 function GunkLog(message)
     logging.Log("[Gunk] " .. message)
@@ -936,7 +955,84 @@ function ResetGunkRun(reason)
     pcall(function() player.StoreSavedRunBool("gunk_spawned_run", false) end)
     RecruitedCache = false
     FormCache = 0
+    ClearWalkComp()
     GunkLog("reset run (" .. reason .. ")")
+end
+
+-- Walk-in-the-Park compensator (see the WALK_* tunables for the full why). NOT cleared in DeleteGunk on purpose:
+-- leash/form respawns delete-and-respawn the body within a tick, and a hard clear there would drop the player's
+-- speed 1.2 -> 1.0 and force a fresh 3s ramp for a blip the perk itself would never have noticed.
+function RefreshWalkPerkBought()
+    local bought = false
+    pcall(function()
+        local rep = game.progressHandler.GetProgressById(WALK_PERK_ID)
+        if rep ~= nil then
+            bought = rep.IsBought()
+        end
+    end)
+    WalkPerkBought = bought
+end
+
+function ClearWalkComp()
+    if WalkComp ~= 1.0 then
+        pcall(function() player.MoveSpeed.ClearMultiplier(WALK_COMP_KEY) end)
+    end
+    WalkComp = 1.0
+    WalkBoost = false
+end
+
+function TickWalkComp()
+    -- Offset by 1 from the CFG cadence so the bought-check, config reload and enemy scan never share a tick --
+    -- and (TickCount starts at 1) so the perk is detected on the very first tick after recruiting.
+    if TickCount % CFG_REFRESH_TICKS == 1 then
+        RefreshWalkPerkBought()
+    end
+    if not WalkPerkBought then
+        ClearWalkComp()
+        return
+    end
+    if TickCount % WALK_SCAN_TICKS == 0 then
+        WalkBoost = false
+        pcall(function()
+            -- The EXACT query the perk runs: include invisible AND invincible enemies.
+            local all = game.GetEnemiesInRadius(WALK_RADIUS, player.transform.position, false)
+            if all == nil or #all == 0 then
+                return   -- truly clear -- the perk handles this itself, compensating would double-boost
+            end
+            for i = 1, #all do
+                local isGunk = false
+                pcall(function() isGunk = all[i].HasInvincibilityRegistered(GUNK_INVINCIBLE_ID) end)
+                if not isGunk then
+                    return   -- a real hostile is in range -- the perk SHOULD be at 1.0x, no compensation
+                end
+            end
+            WalkBoost = true   -- every "enemy" the perk can see is Gunk
+        end)
+    end
+    local target = 1.0
+    if WalkBoost then
+        target = WALK_MAX
+    end
+    if WalkComp == target then
+        return
+    end
+    if WalkComp < target then
+        WalkComp = WalkComp + WALK_STEP
+        if WalkComp > target then
+            WalkComp = target
+        end
+    else
+        WalkComp = WalkComp - WALK_STEP
+        if WalkComp < target then
+            WalkComp = target
+        end
+    end
+    if WalkComp == 1.0 then
+        -- Ramped all the way back down -- remove our entry entirely (same steady state as never having boosted).
+        pcall(function() player.MoveSpeed.ClearMultiplier(WALK_COMP_KEY) end)
+    else
+        pcall(function() player.MoveSpeed.ChangeMultiplier(WALK_COMP_KEY, WalkComp) end)
+    end
 end
 
 -- ===================== ADVR callbacks =====================
@@ -1032,12 +1128,17 @@ function ADVR.onGlobalTick()
         if Body ~= nil then
             DeleteGunk()
         end
+        ClearWalkComp()
         return
     end
     if Body == nil then
         if TickCount >= NextSpawnTick then
             SpawnGunk("tick-heal")
         end
+        -- Keep the Walk-in-the-Park comp honest while the body is between despawn and respawn: with no Gunk in
+        -- the world the scan sees only real enemies, so this ramps the comp down in step with the perk's own
+        -- ramp-up (their product stays ~flat through the handover).
+        TickWalkComp()
         return
     end
     if BodyEnemy == nil then
@@ -1059,6 +1160,7 @@ function ADVR.onGlobalTick()
     -- leftovers must still land and age out (both are no-ops when nothing is tracked).
     TickSpit()
     TickPuddles()
+    TickWalkComp()
     LeashBody()
 end
 
@@ -1077,13 +1179,17 @@ end
 
 function ADVR.onPreGameReload()
     DeleteGunk()
+    -- Drop our MoveSpeed entry before the reload rebuilds the player -- on resume the comp re-ramps from scratch
+    -- exactly like the vanilla perk does (its internal multiplier also resets to 1.0 in onLoad).
+    ClearWalkComp()
 end
 
 -- KNOWN LIMITATION (no fix available): there is no documented ADVR callback for "item manually dropped from
 -- inventory mid-run" (checked the full ADVR callback table -- onGlobalTick, the only thing that could poll for
 -- this, itself only fires while the relic is HELD, so it can't detect its own loss). If the relic is dropped
 -- mid-run, gunk_recruited_run stays true and Body/Puddles are only cleaned up at the next onSpawnInHomeBase/
--- onRunComplete. Revisit if the API ever exposes an onPickupDropped-style hook.
+-- onRunComplete -- and the Walk-in-the-Park comp multiplier (max 1.2x, only if the perk is owned) lingers on
+-- the same schedule. Revisit if the API ever exposes an onPickupDropped-style hook.
 
 function ADVR.onSpawnInHomeBase()
     ResetGunkRun("homeBase")

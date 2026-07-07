@@ -36,5 +36,9 @@ Initial public release.
 - The relic-drop teaser is delayed ~2 s (so the floor-name banner clears first) and stays up 7 s.
 - Robust acquisition: the relic drops on fresh runs *and* resumed (continued) runs, and re-drops after a resume
   if the companion was lost with the reload — on any floor, not just the sewers.
+- **A Walk in the Park compensation**: the Acolyte perk's "no enemies within 13 m" check counts Gunk as an
+  enemy, which would silently disable its speed boost forever. When the perk is owned and Gunk is the only
+  "enemy" in its radius, the mod applies an equal boost under its own name — same +20 % cap, same ramp speed,
+  and it still drops the moment a real hostile closes in.
 - Run-scoped state: recruit/form/drop flags live in the game's per-run save (auto-reset each run, auto-restored
   on resume), so state can never leak between runs.

@@ -97,8 +97,11 @@ the zip directly.
 
 ## Known interactions
 
-- **A Walk in the Park** (Acolyte upgrade): its "no enemies within 13 m" move-speed perk never activates while
-  Gunk is with you. The game's own check counts him as a nearby enemy. Engine-side, nothing the mod can do.
+- **A Walk in the Park** (Acolyte upgrade): the game's own "no enemies within 13 m" check counts Gunk as a
+  nearby enemy, which would silently disable the perk's speed boost for as long as he's with you. The mod
+  compensates: when Gunk is the only "enemy" in the perk's radius, it applies the same boost itself — same
+  +20 % cap, same ramp speed — and drops it the moment a real hostile closes in. You keep the perk you paid
+  for. *(In co-op, the compensation follows whoever carries the relic.)*
 - Gunk's hits are attributed to the player's secondary damage (the same mechanism vanilla relics like Vicious
   Barb use), so on-hit effects can trigger from his attacks.
 - Multiplayer: the relic and companion are untested in co-op. `supportedInMultiplayer` is set, and the design is
@@ -127,8 +130,6 @@ Why a progress-shop script for the detector: it is the only always-on mod conten
 on *resumed* (continued) runs. Achievements only receive world callbacks on runs started fresh from the home
 base. It registers as a small "Gunk's Watcher" node in the Acolyte's insight shop; it works identically whether
 or not it is ever bought.
-
-See `docs/DESIGN.md` for the full design.
 
 ## License
 
